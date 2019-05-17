@@ -39,6 +39,7 @@
 
 #include <hdf5.h>
 
+#include "filter_template.h"
 
 /* Names */
 #define TEST_FILE_NAME  "test_file.h5"
@@ -82,7 +83,7 @@ create_file(void)
         HDF5_ERROR;
 
     /* Set the custom filter */
-    if (H5Pset_filter(dcpl_id, ((H5Z_filter_t)437), H5Z_FLAG_MANDATORY, 0, NULL))
+    if (H5Pset_filter(dcpl_id, FILTER_TEMPLATE_ID, H5Z_FLAG_MANDATORY, 0, NULL))
         HDF5_ERROR;
 
     /* Create the dataset (in the root group).

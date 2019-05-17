@@ -71,6 +71,7 @@ endif()
 set_target_properties(filter_template PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
+    PUBLIC_HEADER filter_template.h
 )
 
 #------------------------------------------------------------------------------
