@@ -51,47 +51,48 @@
  *     filters by The HDF Group. Email the THG help desk at help@hdfgroup.org
  *     to get one assigned to any new production filters you make.
  */
-#define FILTER_TEMPLATE_ID	((H5Z_filter_t)437)
+#define FILTER_TEMPLATE_ID  ((H5Z_filter_t)437)
 
 
 /* The data conversion function for this filter */
 static size_t filter_template_function(unsigned int flags, size_t cd_nelmts,
-				const unsigned int cd_values[], size_t nbytes,
-				size_t *buf_size, void **buf);
+        const unsigned int cd_values[], size_t nbytes, size_t *buf_size,
+        void **buf);
 
 
 /* Information about this filter
  * H5Z_class2_t is defined in H5Zpublic.h
  */
 const H5Z_class2_t FILTER_TEMPLATE_CLASS[1] = {{
-	H5Z_CLASS_T_VERS,                       /* Filter class version */
-	FILTER_TEMPLATE_ID,			/* Filter id number */
-	1,                                      /* encoder_present flag */
-	1,                                      /* decoder_present flag */
-	"HDF5 template filter",                 /* Filter name for debugging */
-	NULL,                                   /* The "can apply" callback */
-	NULL,                                   /* The "set local" callback */
-	(H5Z_func_t)filter_template_function,   /* The actual filter function */
+    H5Z_CLASS_T_VERS,                       /* Filter class version */
+    FILTER_TEMPLATE_ID,                     /* Filter id number */
+    1,                                      /* encoder_present flag */
+    1,                                      /* decoder_present flag */
+    "HDF5 template filter",                 /* Filter name for debugging */
+    NULL,                                   /* The "can apply" callback */
+    NULL,                                   /* The "set local" callback */
+    (H5Z_func_t)filter_template_function,   /* The actual filter function */
 }};
 
 
 /* The plugin functions you must implement when you include H5PLextern.h */
-H5PL_type_t H5PLget_plugin_type(void) {return H5PL_TYPE_FILTER;}
-const void *H5PLget_plugin_info(void) {return FILTER_TEMPLATE_CLASS;}
+H5PL_type_t H5PLget_plugin_type(void) { return H5PL_TYPE_FILTER; }
+const void *H5PLget_plugin_info(void) { return FILTER_TEMPLATE_CLASS; }
 
 
 /* The filter's data transformation goes here */
-static size_t filter_template_function(unsigned int flags, size_t cd_nelmts,
-				const unsigned int cd_values[], size_t nbytes,
-				size_t *buf_size, void **buf)
+static size_t
+filter_template_function(unsigned int flags, size_t cd_nelmts,
+        const unsigned int cd_values[], size_t nbytes, size_t *buf_size,
+        void **buf)
 {
-	/* This is just a shell and does nothing */
+    /* This is just a shell and does nothing */
 
-	if (flags & H5Z_FLAG_REVERSE) {
-		/* Decompress data */
-	} else {
-		/* Compress data */
-	}
+    if (flags & H5Z_FLAG_REVERSE) {
+        /* Decompress data */
+    } else {
+        /* Compress data */
+    }
 
-	return *buf_size;
-}
+    return *buf_size;
+} /* end filter_template_function */
