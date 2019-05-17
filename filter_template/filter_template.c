@@ -79,9 +79,11 @@ filter_template_function(unsigned int flags, size_t cd_nelmts,
 
     if (flags & H5Z_FLAG_REVERSE) {
         /* Decompress data */
-    } else {
+    }
+    else {
         /* Compress data */
     }
 
     return *buf_size;
-} /* end filter_template_function */
+} /* end filter_template_function() */
+

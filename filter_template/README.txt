@@ -13,4 +13,5 @@ The dummy filter literally does nothing to the data.
 
 The test program simply creates a file + dataset using the filter and then
 writes integer data to it and reads it back. For non-lossy filters, you won't
-need to update this program to perform a basic test of your filter.
+need to update this program much to perform a basic test of your filter -
+probably just the filter ID and header file name.
