@@ -34,8 +34,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "filter_template.h"
-
 /* The HDF5 header */
 #include <hdf5.h>
 

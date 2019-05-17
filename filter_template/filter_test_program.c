@@ -38,8 +38,6 @@
 
 #include <hdf5.h>
 
-#include "filter_template.h"
-
 int main(void)
 {
 	return EXIT_SUCCESS;
