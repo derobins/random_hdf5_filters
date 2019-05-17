@@ -18,6 +18,13 @@ add_library(filter_template SHARED
 add_executable(filter_test_program
     filter_test_program.c
 )
+# Copy the shell script that makes it obvious you need to set the plugin path
+add_custom_command(
+    TARGET filter_test_program POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/runme.sh
+            ${CMAKE_CURRENT_BINARY_DIR}/runme.sh
+)
 
 #------------------------------------------------------------------------------
 # Set a default build type if none was specified
