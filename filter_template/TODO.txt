@@ -1,0 +1,5 @@
+* Make sure I can include H5PLextern.h.
+
+* Make the test filter a real filter.
+
+* Set up CTest to run the test program.

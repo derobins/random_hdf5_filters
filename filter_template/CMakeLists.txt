@@ -5,15 +5,25 @@ project(filter_template VERSION 1.0.1 DESCRIPTION "template for HDF5 filters")
 
 include(GNUInstallDirs)
 
+#------------------------------------------------------------------------------
+# Add the filter plugin
+#------------------------------------------------------------------------------
 add_library(filter_template SHARED
 	filter_template.c
+)
+
+#------------------------------------------------------------------------------
+# Add the test program
+#------------------------------------------------------------------------------
+add_executable(filter_test_program
+	filter_test_program.c
 )
 
 #------------------------------------------------------------------------------
 # Set a default build type if none was specified
 #------------------------------------------------------------------------------
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+	set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 	# Set the possible values of build type for cmake-gui
 	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
@@ -54,7 +64,8 @@ endif()
 set_target_properties(filter_template PROPERTIES
 	VERSION ${PROJECT_VERSION}
 	SOVERSION 1
-	PUBLIC_HEADER filter_template.h)
+	PUBLIC_HEADER filter_template.h
+)
 
 #------------------------------------------------------------------------------
 # Set external include directories and libraries
@@ -67,9 +78,19 @@ target_link_libraries(filter_template
 	${FILTER_TEMPLATE_EXT_PKG_DEPENDENCIES}
 )
 
+target_include_directories(filter_test_program
+	SYSTEM PUBLIC ${FILTER_TEMPLATE_EXT_INCLUDE_DEPENDENCIES}
+)
+target_link_libraries(filter_test_program
+	${FILTER_TEMPLATE_EXT_LIB_DEPENDENCIES}
+	${FILTER_TEMPLATE_EXT_PKG_DEPENDENCIES}
+)
+
 #------------------------------------------------------------------------------
 # Install stuff
 #------------------------------------------------------------------------------
 install(TARGETS filter_template
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
