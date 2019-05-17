@@ -49,4 +49,6 @@
  */
 #define FILTER_TEMPLATE_ID  ((H5Z_filter_t)437)
 
+#define MAGIC_CHAR          ((char)42)
+
 #endif /* _FILTER_TEMPLATE_H */
