@@ -36,33 +36,24 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #------------------------------------------------------------------------------
+# Find OpenMP
+#------------------------------------------------------------------------------
+find_package(OpenMP REQUIRED)
+
+#------------------------------------------------------------------------------
 # Find HDF5
 #------------------------------------------------------------------------------
 # You probably only need 1.8 for this to work...
-find_package(HDF5 NO_MODULE NAMES hdf5 COMPONENTS C shared)
+find_package(HDF5 NO_MODULE NAMES hdf5 COMPONENTS C shared REQUIRED)
 if(HDF5_FOUND)
-    set(HDF5_C_SHARED_LIBRARY hdf5-shared)
+    # NOTE: This may be hdf5-shared. Need to hack this to work with both.
+    set(HDF5_C_SHARED_LIBRARY "hdf5::hdf5-shared")
     if(NOT TARGET ${HDF5_C_SHARED_LIBRARY})
-        message(FATAL_ERROR "Could not find hdf5 shared target, please make "
-        "sure that HDF5 has ben compiled with shared libraries enabled.")
+        message(FATAL_ERROR "Could not find hdf5-shared target. Please make sure that HDF5 has been compiled with shared libraries enabled.")
     endif()
     set(FILTER_EXT_PKG_DEPENDENCIES
         ${FILTER_EXT_PKG_DEPENDENCIES}
         ${HDF5_C_SHARED_LIBRARY})
-else()
-    # Allow for HDF5 autotools builds
-    # NOTE: I have not gotten this to work...
-    find_package(HDF5 MODULE REQUIRED)
-    if(HDF5_FOUND)
-        set(FILTER_EXT_INCLUDE_DEPENDENCIES
-            ${FILTER_EXT_INCLUDE_DEPENDENCIES}
-            ${HDF5_INCLUDE_DIRS})
-        set(FILTER_EXT_LIB_DEPENDENCIES
-            ${FILTER_EXT_LIB_DEPENDENCIES}
-            ${HDF5_LIBRARIES})
-    else()
-        message(FATAL_ERROR "Could not find HDF5, please check HDF5_DIR.")
-    endif()
 endif()
 
 #------------------------------------------------------------------------------

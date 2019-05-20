@@ -50,11 +50,11 @@
  * Note that the sizes are in elements, not bytes
  */
 #define NDIMS           1                       /* 1-dimensional */
-#define DSET_DIMS       (5 * 1024 * 1024)       /* 20 MiB w/ 32-bit ints */
-#define CHUNK_DIMS      (128 * 1024)            /* 512 KiB w/ 32-bit ints */
+#define DSET_DIMS       (250 * 1024 * 1024)     /* 1 GiB w/ 32-bit ints */
+#define CHUNK_DIMS      (256 * 1024)            /* 1 MiB w/ 32-bit ints */
 
 /* I/O size */
-#define ELEMS_PER_IO    (64 * 1024)             /* 1/2 chunk to force partial chunk writes */
+#define ELEMS_PER_IO    CHUNK_DIMS
 
 /* Some error macros */
 #define PRINT_ERROR_MSG         do {fprintf(stderr, "***ERROR*** at line %d...\n", __LINE__);} while (0)
@@ -87,8 +87,10 @@ create_file(void)
         HDF5_ERROR;
 
     /* Set the custom filter */
-    if (H5Pset_filter(dcpl_id, SHUFFLE_ID, H5Z_FLAG_MANDATORY, 0, NULL))
-        HDF5_ERROR;
+//    if (H5Pset_filter(dcpl_id, SHUFFLE_ID, H5Z_FLAG_MANDATORY, 0, NULL))
+//        HDF5_ERROR;
+//    if (H5Pset_shuffle(dcpl_id) < 0)
+//        HDF5_ERROR;
 
     /* Create the dataset (in the root group).
      *
