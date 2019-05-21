@@ -1,7 +1,6 @@
 /* shuffle.c
  *
- * This is a version of the HDF5 shuffle filter for use in testing performance
- * features like CUDA/OpenACC and OpenMP.
+ * A clone of the official HDF5 shuffle filter.
  *
  *
  * Copyright (C) 2019 Dana Robinson <dana.e.robinson@gmail.com>

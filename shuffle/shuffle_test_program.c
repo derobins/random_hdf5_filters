@@ -99,7 +99,7 @@ create_file(const char *filename, int filter_number, int gzip_level)
     }
     else if (filter_number != 0) {
         printf("SHUFFLE FILTER %d", filter_number);
-        if (H5Pset_filter(dcpl_id, SHUFFLE_ID, H5Z_FLAG_MANDATORY, 0, NULL))
+        if (H5Pset_filter(dcpl_id, filter_number, H5Z_FLAG_MANDATORY, 0, NULL))
             HDF5_ERROR;
     }
 

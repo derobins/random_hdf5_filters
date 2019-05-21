@@ -1,7 +1,7 @@
-/* shuffle_noduff.c
+/* shuffle_noduff_omp.c
  *
  * A clone of the official HDF5 shuffle filter, but with the Duff's device
- * replaced with a simple memory copy.
+ * replaced with a simple memory copy and OpenMP enabled.
  *
  *
  * Copyright (C) 2019 Dana Robinson <dana.e.robinson@gmail.com>
@@ -58,10 +58,10 @@ static size_t filter_shuffle(unsigned int flags, size_t cd_nelmts,
  */
 const H5Z_class2_t SHUFFLE_CLASS[1] = {{
     H5Z_CLASS_T_VERS,                       /* Filter class version */
-    SHUFFLE_NODUFF_ID,                      /* Filter id number */
+    SHUFFLE_NODUFF_OMP_ID,                  /* Filter id number */
     1,                                      /* encoder_present flag */
     1,                                      /* decoder_present flag */
-    "shuffle_noduff",                       /* Filter name for debugging */
+    "shuffle_noduff_omp",                   /* Filter name for debugging */
     NULL,                                   /* The "can apply" callback */
     set_local_shuffle,                      /* The "set local" callback */
     (H5Z_func_t)filter_shuffle,             /* The actual filter function */
@@ -88,7 +88,7 @@ set_local_shuffle(hid_t dcpl_id, hid_t type_id, hid_t space_id)
     unsigned cd_values[SHUFFLE_TOTAL_NPARMS];   /* Filter parameters */
 
     /* Get the filter's current parameters */
-    if (H5Pget_filter_by_id(dcpl_id, SHUFFLE_NODUFF_ID, &flags, &cd_nelmts, cd_values, (size_t)0, NULL, NULL) < 0)
+    if (H5Pget_filter_by_id(dcpl_id, SHUFFLE_NODUFF_OMP_ID, &flags, &cd_nelmts, cd_values, (size_t)0, NULL, NULL) < 0)
         goto error;
 
     /* Get the type size */
@@ -99,7 +99,7 @@ set_local_shuffle(hid_t dcpl_id, hid_t type_id, hid_t space_id)
     cd_values[SHUFFLE_PARM_SIZE] = (unsigned)type_size;
 
     /* Modify the filter's parameters for this dataset */
-    if(H5Pmodify_filter(dcpl_id, SHUFFLE_NODUFF_ID, flags, (size_t)SHUFFLE_TOTAL_NPARMS, cd_values) < 0)
+    if(H5Pmodify_filter(dcpl_id, SHUFFLE_NODUFF_OMP_ID, flags, (size_t)SHUFFLE_TOTAL_NPARMS, cd_values) < 0)
         goto error;
 
     return 0;

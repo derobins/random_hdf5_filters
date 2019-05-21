@@ -11,7 +11,7 @@ make
 echo "Times are REAL,USER,SYS in seconds"
 
 # Loop over shuffle filters
-for shuffle_filter_id in 0 1 315 316
+for shuffle_filter_id in 0 1 315 316 318
 do
     # Set the gzip level
     gzip_level=0

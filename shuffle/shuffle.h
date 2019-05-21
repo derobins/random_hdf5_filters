@@ -44,9 +44,9 @@
  * 4) #2 w/ OpenMP support
  */
 #define SHUFFLE_ID                  ((H5Z_filter_t)315)
-#define NODUFF_SHUFFLE_ID           ((H5Z_filter_t)316)
-#define OMP_SHUFFLE_ID              ((H5Z_filter_t)317)
-#define NODUFF_OMP_SHUFFLE_ID       ((H5Z_filter_t)318)
+#define SHUFFLE_NODUFF_ID           ((H5Z_filter_t)316)
+#define SHUFFLE_OMP_ID              ((H5Z_filter_t)317)
+#define SHUFFLE_NODUFF_OMP_ID       ((H5Z_filter_t)318)
 
 #endif /* _SHUFFLE_H */
 

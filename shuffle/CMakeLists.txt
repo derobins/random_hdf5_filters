@@ -16,6 +16,10 @@ add_library(shuffle_noduff SHARED
     shuffle_noduff.c
 )
 
+add_library(shuffle_noduff_omp SHARED
+    shuffle_noduff_omp.c
+)
+
 #------------------------------------------------------------------------------
 # Add the test program
 #------------------------------------------------------------------------------
@@ -47,6 +51,7 @@ endif()
 # Find OpenMP
 #------------------------------------------------------------------------------
 find_package(OpenMP REQUIRED)
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
 
 #------------------------------------------------------------------------------
 # Find HDF5
@@ -78,6 +83,11 @@ set_target_properties(shuffle_noduff PROPERTIES
     SOVERSION 1
 )
 
+set_target_properties(shuffle_noduff_omp PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+)
+
 #------------------------------------------------------------------------------
 # Set external include directories and libraries
 #------------------------------------------------------------------------------
@@ -93,6 +103,14 @@ target_include_directories(shuffle_noduff
     SYSTEM PUBLIC ${FILTER_EXT_INCLUDE_DEPENDENCIES}
 )
 target_link_libraries(shuffle_noduff
+    ${FILTER_EXT_LIB_DEPENDENCIES}
+    ${FILTER_EXT_PKG_DEPENDENCIES}
+)
+
+target_include_directories(shuffle_noduff_omp
+    SYSTEM PUBLIC ${FILTER_EXT_INCLUDE_DEPENDENCIES}
+)
+target_link_libraries(shuffle_noduff_omp
     ${FILTER_EXT_LIB_DEPENDENCIES}
     ${FILTER_EXT_PKG_DEPENDENCIES}
 )
@@ -114,6 +132,11 @@ install(TARGETS shuffle
 )
 
 install(TARGETS shuffle_noduff
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(TARGETS shuffle_noduff_omp
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
