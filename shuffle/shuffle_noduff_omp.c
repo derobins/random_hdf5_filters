@@ -128,7 +128,7 @@ filter_shuffle(unsigned int flags, size_t cd_nelmts, const unsigned int cd_value
     /* Get the number of bytes per element from the parameter block */
     bytes_per_elem = cd_values[SHUFFLE_PARM_SIZE];
 
-    /* Compute the number of elements in buffer */
+    /* Compute the number of elements in buffer and each slice */
     n_elements = nbytes / bytes_per_elem;
 
     /* If this is a single byte type or we have fractional elements, do nothing */
@@ -148,26 +148,27 @@ filter_shuffle(unsigned int flags, size_t cd_nelmts, const unsigned int cd_value
         /* UNSHUFFLE */
         /*************/
 
-        /* Get a pointer to the source buffer */
-        _src = (unsigned char *)(*buf);
-
         /* Input; unshuffle */
+        /* Loop over bytes in type */
+//        #pragma omp parallel for shared(dest) private(_src, _dest)
         for (i = 0; i < bytes_per_elem; i++) {
 
-            int j = n_elements;
+            int di, si;
 
+            _src = (unsigned char *)(*buf) + (i * n_elements);
             _dest = ((unsigned char *)dest) + i;
 
-            while(j > 0) {
-                *_dest = *_src++;
-                _dest += bytes_per_elem;
-
-                j--;
+            di = 0;
+            for (si = 0; si < n_elements; si++) {
+                _dest[di] = _src[si];
+                di += bytes_per_elem;
             }
         }
 
         /* Add leftover to the end of data */
+        /* This will have to be updated! */
         if (leftover > 0) {
+            printf("LEFTOVER\n");
             /* Adjust back to end of shuffled bytes */
             _dest -= (bytes_per_elem - 1);
             memcpy((void *)_dest, (void *)_src, leftover);
@@ -180,26 +181,26 @@ filter_shuffle(unsigned int flags, size_t cd_nelmts, const unsigned int cd_value
         /* SHUFFLE */
         /***********/
 
-        /* Get a pointer to the destination buffer */
-        _dest = (unsigned char *)dest;
-
         /* Output; shuffle */
+        /* Loop over bytes in type */
+        #pragma omp parallel for shared(dest) private(_src, _dest)
         for (i = 0; i < bytes_per_elem; i++) {
 
-            int j = n_elements;
+            int di, si;
 
             _src = ((unsigned char *)(*buf)) + i;
+            _dest = (unsigned char *)dest + (i * n_elements);
 
-            while(j > 0) {
-                *_dest++ = *_src;
-                _src += bytes_per_elem;
-
-                j--;
+            si = 0;
+            for (di = 0; di < n_elements; di++) {
+                _dest[di] = _src[si];
+                si += bytes_per_elem;
             }
         }
 
         /* Add leftover to the end of data */
         if(leftover > 0) {
+            printf("LEFTOVER\n");
             /* Adjust back to end of shuffled bytes */
             _src -= (bytes_per_elem - 1);
             memcpy((void*)_dest, (void*)_src, leftover);
