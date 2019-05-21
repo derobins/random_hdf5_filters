@@ -36,16 +36,17 @@
 #ifndef _SHUFFLE_H
 #define _SHUFFLE_H
 
-/* The filter ID number (NOTE: Has nothing to do with HDF5 hid_t IDs)
+/* IDs for the filters we're creating:
  *
- *     Values below 256 are for HDF5 library use
- *
- *     Values between 256 and 511 (inclusive) are for developing filters
- *
- *     Values between 512 and 65535 (inclusive) are assigned to production
- *     filters by The HDF Group. Email the THG help desk at help@hdfgroup.org
- *     to get one assigned to any new production filters you make.
+ * 1) Shuffle w/ Duff's device copy (clone of HDF5 shuffle)
+ * 2) Shuffle w/o Duff's device copy
+ * 3) #1 w/ OpenMP support
+ * 4) #2 w/ OpenMP support
  */
-#define SHUFFLE_ID      ((H5Z_filter_t)315)
+#define SHUFFLE_ID                  ((H5Z_filter_t)315)
+#define NODUFF_SHUFFLE_ID           ((H5Z_filter_t)316)
+#define OMP_SHUFFLE_ID              ((H5Z_filter_t)317)
+#define NODUFF_OMP_SHUFFLE_ID       ((H5Z_filter_t)318)
 
 #endif /* _SHUFFLE_H */
+

@@ -43,7 +43,8 @@
 #include "shuffle.h"
 
 /* Names */
-#define TEST_FILE_NAME  "test_file.h5"
+#define TEST_FILE_NAME  "shuffle_filter_%d_gzip_level_%d.h5"
+#define FNAME_MAX       255
 #define DSET_NAME       "filtered data"
 
 /* Dataset and chunk sizes
@@ -63,7 +64,7 @@
 
 
 int
-create_file(void)
+create_file(const char *filename, int filter_number, int gzip_level)
 {
     hid_t fid       = H5I_INVALID_HID;
     hid_t sid       = H5I_INVALID_HID;
@@ -73,7 +74,7 @@ create_file(void)
     hsize_t chunk_dims  = CHUNK_DIMS;
 
     /* Create the test file */
-    if (H5I_INVALID_HID == (fid = H5Fcreate(TEST_FILE_NAME, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)))
+    if (H5I_INVALID_HID == (fid = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT)))
         HDF5_ERROR;
 
     /* Create a simple dataspace to describe the dataset's size */
@@ -86,11 +87,35 @@ create_file(void)
     if (H5Pset_chunk(dcpl_id, NDIMS, &chunk_dims) < 0)
         HDF5_ERROR;
 
-    /* Set the custom filter */
-//    if (H5Pset_filter(dcpl_id, SHUFFLE_ID, H5Z_FLAG_MANDATORY, 0, NULL))
-//        HDF5_ERROR;
-//    if (H5Pset_shuffle(dcpl_id) < 0)
-//        HDF5_ERROR;
+    /* Set the filters based on the parameters */
+    /* SHUFFLE */
+    if (0 == filter_number) {
+        printf("NO SHUFFLE");
+    }
+    else if (1 == filter_number) {
+        printf("NATIVE SHUFFLE");
+        if (H5Pset_shuffle(dcpl_id) < 0)
+            HDF5_ERROR;
+    }
+    else if (filter_number != 0) {
+        printf("SHUFFLE FILTER %d", filter_number);
+        if (H5Pset_filter(dcpl_id, SHUFFLE_ID, H5Z_FLAG_MANDATORY, 0, NULL))
+            HDF5_ERROR;
+    }
+
+    printf(" - ");
+
+    /* GZIP */
+    if (0 == gzip_level) {
+        printf("NO GZIP");
+    }
+    else if (gzip_level !=0) {
+        printf("GZIP LEVEL %d", gzip_level);
+        if (H5Pset_deflate(dcpl_id, gzip_level) < 0)
+            HDF5_ERROR;
+    }
+
+    printf("\n");
 
     /* Create the dataset (in the root group).
      *
@@ -129,7 +154,7 @@ error:
 } /* end create_file() */
 
 int
-write_to_file(void)
+write_to_file(const char *filename)
 {
     hid_t fid       = H5I_INVALID_HID;
     hid_t msid      = H5I_INVALID_HID;
@@ -141,7 +166,7 @@ write_to_file(void)
     int i;
 
     /* Open the test file */
-    if (H5I_INVALID_HID == (fid = H5Fopen(TEST_FILE_NAME, H5F_ACC_RDWR, H5P_DEFAULT)))
+    if (H5I_INVALID_HID == (fid = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT)))
         HDF5_ERROR;
 
     /* Open the dataset */
@@ -209,7 +234,7 @@ error:
 } /* end write_to_file() */
 
 int
-read_from_file(void)
+read_from_file(const char *filename)
 {
     hid_t fid       = H5I_INVALID_HID;
     hid_t msid      = H5I_INVALID_HID;
@@ -221,7 +246,7 @@ read_from_file(void)
     int i;
 
     /* Open the test file (read-only) */
-    if (H5I_INVALID_HID == (fid = H5Fopen(TEST_FILE_NAME, H5F_ACC_RDONLY, H5P_DEFAULT)))
+    if (H5I_INVALID_HID == (fid = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT)))
         HDF5_ERROR;
 
     /* Open the dataset */
@@ -293,21 +318,72 @@ error:
     return -1;
 } /* end read_from_file() */
 
+void
+usage(FILE *stream)
+{
+    fprintf(stream, "Usage: shuffle_test_program <shuffle filter #> <gzip level>\n");
+    fprintf(stream, "\n");
+    fprintf(stream, "   Both arguments are mandatory\n");
+    fprintf(stream, "\n");
+    fprintf(stream, "<shuffle filter #>:\n");
+    fprintf(stream, "   0 = No shuffle filter\n");
+    fprintf(stream, "   1 = Library shuffle filter\n");
+    fprintf(stream, "   315-8 = Shuffle filters built in this project\n");
+    fprintf(stream, "\n");
+    fprintf(stream, "<gzip level>:\n");
+    fprintf(stream, "   0 = Don't follow shuffle with gzip\n");
+    fprintf(stream, "   1-9 = Use gzip after the shuffle with compression level n\n");
+    fprintf(stream, "\n");
+} /* end usage() */
 
 int
-main(void)
+main(int argc, char *argv[])
 {
-    if (create_file() < 0)
+    int filter_number = 0;
+    int filter_ok = 0;
+    int gzip_level = 0;
+    char *filename = NULL;
+
+    /* Parse command line (crudely) */
+    if (argc != 3) {
+        usage(stderr);
+        PROGRAM_ERROR("Incorrect number of parameters");
+    }
+
+    filter_number = atoi(argv[1]);
+    filter_ok = filter_number == 0 || filter_number == 1 || (filter_number >= 315 && filter_number <= 318);
+    if (!filter_ok) {
+        usage(stderr);
+        PROGRAM_ERROR("Filters must be between 315 and 318 (inclusive). See shuffle.h for IDs.");
+    }
+
+    gzip_level = atoi(argv[2]);
+    if (gzip_level < 0 || gzip_level > 9) {
+        usage(stderr);
+        PROGRAM_ERROR("gzip level must be between 0 and 9 (inclusive)\n");
+    }
+
+    /* Compose the test file name */
+    if (NULL == (filename = (char *)calloc(FNAME_MAX, sizeof(char))))
+        PROGRAM_ERROR("Unable to allocate memory for filename");
+    if (snprintf(filename, FNAME_MAX, TEST_FILE_NAME, filter_number, gzip_level) < 0)
+        PROGRAM_ERROR("Unable to compose filename");
+
+    /* Create file, write to it, and read the data back */
+    if (create_file(filename, filter_number, gzip_level) < 0)
         PROGRAM_ERROR("Unable to create file");
 
-    if (write_to_file() < 0)
+    if (write_to_file(filename) < 0)
         PROGRAM_ERROR("Unable to write to file");
 
-    if (read_from_file() < 0)
+    if (read_from_file(filename) < 0)
         PROGRAM_ERROR("Unable to read from file");
+
+    free(filename);
 
     return EXIT_SUCCESS;
 
 error:
+    free(filename);
     return EXIT_FAILURE;
 } /* end main */

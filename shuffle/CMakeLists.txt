@@ -6,31 +6,39 @@ project(shuffle VERSION 1.0.1 DESCRIPTION "shuffle filter for HDF5")
 include(GNUInstallDirs)
 
 #------------------------------------------------------------------------------
-# Add the filter plugin
+# Add the filter plugins
 #------------------------------------------------------------------------------
 add_library(shuffle SHARED
     shuffle.c
 )
 
+add_library(shuffle_noduff SHARED
+    shuffle_noduff.c
+)
+
 #------------------------------------------------------------------------------
 # Add the test program
 #------------------------------------------------------------------------------
-add_executable(test_program
-    test_program.c
+add_executable(shuffle_test_program
+    shuffle_test_program.c
 )
-# Copy the shell script that makes it obvious you need to set the plugin path
+
+#------------------------------------------------------------------------------
+# Copy the profiling shell script
+#------------------------------------------------------------------------------
 add_custom_command(
-    TARGET test_program POST_BUILD
+    TARGET shuffle_test_program POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_SOURCE_DIR}/runme.sh
-            ${CMAKE_CURRENT_BINARY_DIR}/runme.sh
+            ${CMAKE_SOURCE_DIR}/profile.sh
+            ${CMAKE_CURRENT_BINARY_DIR}/profile.sh
 )
 
 #------------------------------------------------------------------------------
 # Set a default build type if none was specified
+# This is profiling code, so it's best to build Release by default
 #------------------------------------------------------------------------------
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
     # Set the possible values of build type for cmake-gui
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
@@ -65,6 +73,11 @@ set_target_properties(shuffle PROPERTIES
     PUBLIC_HEADER shuffle.h
 )
 
+set_target_properties(shuffle_noduff PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+)
+
 #------------------------------------------------------------------------------
 # Set external include directories and libraries
 #------------------------------------------------------------------------------
@@ -76,10 +89,18 @@ target_link_libraries(shuffle
     ${FILTER_EXT_PKG_DEPENDENCIES}
 )
 
-target_include_directories(test_program
+target_include_directories(shuffle_noduff
     SYSTEM PUBLIC ${FILTER_EXT_INCLUDE_DEPENDENCIES}
 )
-target_link_libraries(test_program
+target_link_libraries(shuffle_noduff
+    ${FILTER_EXT_LIB_DEPENDENCIES}
+    ${FILTER_EXT_PKG_DEPENDENCIES}
+)
+
+target_include_directories(shuffle_test_program
+    SYSTEM PUBLIC ${FILTER_EXT_INCLUDE_DEPENDENCIES}
+)
+target_link_libraries(shuffle_test_program
     ${FILTER_EXT_LIB_DEPENDENCIES}
     ${FILTER_EXT_PKG_DEPENDENCIES}
 )
@@ -88,6 +109,11 @@ target_link_libraries(test_program
 # Install stuff
 #------------------------------------------------------------------------------
 install(TARGETS shuffle
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(TARGETS shuffle_noduff
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
