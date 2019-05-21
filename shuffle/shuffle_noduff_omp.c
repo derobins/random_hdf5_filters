@@ -158,11 +158,8 @@ filter_shuffle(unsigned int flags, size_t cd_nelmts, const unsigned int cd_value
             _src = (unsigned char *)(*buf) + (i * n_elements);
             _dest = ((unsigned char *)dest) + i;
 
-            di = 0;
-            for (si = 0; si < n_elements; si++) {
+            for (si = 0, di = 0; si < n_elements; si++, di += bytes_per_elem)
                 _dest[di] = _src[si];
-                di += bytes_per_elem;
-            }
         }
 
         /* Add leftover to the end of data */
@@ -191,11 +188,8 @@ filter_shuffle(unsigned int flags, size_t cd_nelmts, const unsigned int cd_value
             _src = ((unsigned char *)(*buf)) + i;
             _dest = (unsigned char *)dest + (i * n_elements);
 
-            si = 0;
-            for (di = 0; di < n_elements; di++) {
+            for (si = 0, di = 0; di < n_elements; si += bytes_per_elem, di++)
                 _dest[di] = _src[si];
-                si += bytes_per_elem;
-            }
         }
 
         /* Add leftover to the end of data */
